@@ -8,7 +8,7 @@
     body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f4; }
     h1 { color: #333; }
     form { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    input[type="file"], input[type="text"] { margin-bottom: 10px; width: 100%; padding: 8px; }
+    input[type="file"], input[type="text"], input[type="email"] { margin-bottom: 10px; width: 100%; padding: 8px; }
     button { padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
     button:hover { background-color: #0056b3; }
     #status { margin-top: 20px; font-weight: bold; }
@@ -23,6 +23,13 @@
 
     <label>Enter Parameter:</label><br/>
     <input type="text" id="param" placeholder="Parameter value" required /><br/>
+
+    <!-- New fields for ServiceNow Incident and Email ID -->
+    <label>ServiceNow Incident Number:</label><br/>
+    <input type="text" id="servicenowIncident" placeholder="Incident Number" required /><br/>
+
+    <label>Email ID:</label><br/>
+    <input type="email" id="emailId" placeholder="your.email@example.com" required /><br/>
 
     <button type="submit">Run Workflow</button>
 </form>
@@ -41,6 +48,8 @@ document.getElementById('workflowForm').addEventListener('submit', function(e) {
 
     const fileInput = document.getElementById('inputFile');
     const param = document.getElementById('param').value;
+    const incident = document.getElementById('servicenowIncident').value;
+    const email = document.getElementById('emailId').value;
 
     if (fileInput.files.length === 0) {
         alert('Please select a file.');
@@ -64,6 +73,13 @@ document.getElementById('workflowForm').addEventListener('submit', function(e) {
             downloadLink.href = outputFileUrl;
             downloadLink.style.display = 'block';
             downloadLink.innerText = 'Download Output File';
+
+            // You can also display the parameters entered for confirmation
+            alert(
+                'Parameters:\n' +
+                'Incident: ' + incident + '\n' +
+                'Email: ' + email
+            );
 
         }, 3000); // simulate 3 seconds processing
     }, 2000); // simulate 2 seconds upload
