@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Workflow App</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f4; }
+    h1 { color: #333; }
+    form { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input[type="file"], input[type="text"] { margin-bottom: 10px; width: 100%; padding: 8px; }
+    button { padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+    #status { margin-top: 20px; font-weight: bold; }
+    #downloadLink { margin-top: 20px; display: none; font-size: 16px; }
+</style>
+</head>
+<body>
+<h1>Upload File & Run Workflow</h1>
+<form id="workflowForm">
+    <label>Select Input File:</label><br/>
+    <input type="file" id="inputFile" required /><br/>
+
+    <label>Enter Parameter:</label><br/>
+    <input type="text" id="param" placeholder="Parameter value" required /><br/>
+
+    <button type="submit">Run Workflow</button>
+</form>
+
+<div id="status"></div>
+<a id="downloadLink" href="#" download>Download Output File</a>
+
+<script>
+document.getElementById('workflowForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const statusDiv = document.getElementById('status');
+    const downloadLink = document.getElementById('downloadLink');
+
+    statusDiv.innerHTML = 'Uploading file...';
+
+    const fileInput = document.getElementById('inputFile');
+    const param = document.getElementById('param').value;
+
+    if (fileInput.files.length === 0) {
+        alert('Please select a file.');
+        return;
+    }
+
+    const file = fileInput.files[0];
+
+    // Simulate upload delay
+    setTimeout(() => {
+        statusDiv.innerHTML = 'File uploaded. Triggering workflow...';
+
+        // Simulate processing delay
+        setTimeout(() => {
+            statusDiv.innerHTML = 'Processing complete!';
+
+            // Fake output file URL (replace with your actual file URL later)
+            const outputFileUrl = 'https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls';
+
+            // Show download link
+            downloadLink.href = outputFileUrl;
+            downloadLink.style.display = 'block';
+            downloadLink.innerText = 'Download Output File';
+
+        }, 3000); // simulate 3 seconds processing
+    }, 2000); // simulate 2 seconds upload
+});
+</script>
+</body>
+</html>
