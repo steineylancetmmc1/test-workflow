@@ -16,12 +16,15 @@
 </style>
 </head>
 <body>
-<h1>Upload File & Run Workflow</h1>
+<h1>EBX5 File Generator</h1>
 <form id="workflowForm">
     <label>Select Input File:</label><br/>
     <input type="file" id="inputFile" required /><br/>
 
-    <label>Enter Parameter:</label><br/>
+    <label>Request for(RC/ACCT/ENTY):</label><br/>
+    <input type="text" id="param" placeholder="Parameter value" required /><br/>
+
+    <label>Request Type(New/Rename/Remove):</label><br/>
     <input type="text" id="param" placeholder="Parameter value" required /><br/>
 
     <!-- New fields for ServiceNow Incident and Email ID -->
