@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>My Workflow App</title>
+<title>ADLS File Upload</title>
 <style>
     body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f4; }
     h1 { color: #333; }
@@ -16,32 +16,37 @@
 </style>
 </head>
 <body>
-<h1>EBX5 File Generator</h1>
-<form id="workflowForm">
+<h1>ADLS File Upload</h1>
+<form id="uploadForm">
     <label>Select Input File:</label><br/>
     <input type="file" id="inputFile" required /><br/>
 
-    <label>Request for(RC/ACCT/ENTY):</label><br/>
-    <input type="text" id="param" placeholder="Parameter value" required /><br/>
+    <!-- Optional parameters (not required for now) -->
+    <label>Parameter (RC/ACCT/ENTY):</label><br/>
+    <input type="text" id="param" placeholder="Parameter value" /><br/>
 
-    <label>Request Type(New/Rename/Remove):</label><br/>
-    <input type="text" id="param" placeholder="Parameter value" required /><br/>
+    <label>Request Type (New/Rename/Remove):</label><br/>
+    <input type="text" id="requestType" placeholder="Request type" /><br/>
 
-    <!-- New fields for ServiceNow Incident and Email ID -->
     <label>ServiceNow Incident Number:</label><br/>
-    <input type="text" id="servicenowIncident" placeholder="Incident Number" required /><br/>
+    <input type="text" id="servicenowIncident" placeholder="Incident Number" /><br/>
 
     <label>Email ID:</label><br/>
-    <input type="email" id="emailId" placeholder="your.email@example.com" required /><br/>
+    <input type="email" id="emailId" placeholder="your.email@example.com" /><br/>
 
-    <button type="submit">Run Workflow</button>
+    <button type="submit">Upload File</button>
 </form>
 
 <div id="status"></div>
-<a id="downloadLink" href="#" download>Download Output File</a>
+<a id="downloadLink" href="#" download>Download Uploaded File</a>
 
 <script>
-document.getElementById('workflowForm').addEventListener('submit', function(e) {
+const containerSasUrl = "https://fsvnadls2uset2satadf.blob.core.windows.net/test1?sv=2024-11-04&ss=bfqt&srt=sco&sp=rcw&st=2025-08-22T09:42:58Z&se=2025-08-29T17:57:58Z&sig=06AgVOHsEEND%2FCX5jMT175Yx9k8QRdpWm%2Bvj3v0xWAk%3D";
+
+// Fixed folder path inside container
+const folderPath = "Steiney/AI/Dops/RC/test_copy";
+
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const statusDiv = document.getElementById('status');
@@ -50,9 +55,6 @@ document.getElementById('workflowForm').addEventListener('submit', function(e) {
     statusDiv.innerHTML = 'Uploading file...';
 
     const fileInput = document.getElementById('inputFile');
-    const param = document.getElementById('param').value;
-    const incident = document.getElementById('servicenowIncident').value;
-    const email = document.getElementById('emailId').value;
 
     if (fileInput.files.length === 0) {
         alert('Please select a file.');
@@ -61,31 +63,29 @@ document.getElementById('workflowForm').addEventListener('submit', function(e) {
 
     const file = fileInput.files[0];
 
-    // Simulate upload delay
-    setTimeout(() => {
-        statusDiv.innerHTML = 'File uploaded. Triggering workflow...';
+    const filename = file.name;
+    const encodedFilename = encodeURIComponent(filename);
 
-        // Simulate processing delay
-        setTimeout(() => {
-            statusDiv.innerHTML = 'Processing complete!';
+    // Construct the full URL to upload into the fixed folder
+    const fullUrl = `${containerSasUrl.split('?')[0]}/${folderPath}/${encodedFilename}?${containerSasUrl.split('?')[1]}`;
 
-            // Fake output file URL (replace with your actual file URL later)
-            const outputFileUrl = 'https://file-examples.com/wp-content/uploads/2017/02/file_example_XLS_10.xls';
-
+    // Upload the file directly
+    fetch(fullUrl, {
+        method: 'PUT',
+        headers: { 'x-ms-blob-type': 'BlockBlob' },
+        body: file
+    }).then(res => {
+        if (res.ok || res.status === 201) {
+            statusDiv.innerHTML = 'Upload successful!';
             // Show download link
-            downloadLink.href = outputFileUrl;
-            downloadLink.style.display = 'block';
-            downloadLink.innerText = 'Download Output File';
-
-            // You can also display the parameters entered for confirmation
-            alert(
-                'Parameters:\n' +
-                'Incident: ' + incident + '\n' +
-                'Email: ' + email
-            );
-
-        }, 3000); // simulate 3 seconds processing
-    }, 2000); // simulate 2 seconds upload
+            document.getElementById('downloadLink').href = fullUrl.split('?')[0];
+            document.getElementById('downloadLink').style.display = 'block';
+        } else {
+            statusDiv.innerHTML = 'Upload failed: ' + res.statusText;
+        }
+    }).catch(err => {
+        statusDiv.innerHTML = 'Error: ' + err.message;
+    });
 });
 </script>
 </body>
